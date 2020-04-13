@@ -1,0 +1,410 @@
+        OCaml version 4.01.0+ocp1
+
+# let fold_right_nat case_zero case_succ n_given =
+ (* fold_right_nat : 'a -> ('a -> 'a) -> int -> 'a *)
+  let () = assert (n_given >= 0) in
+  let rec visit n =
+    if n = 0
+    then case_zero
+    else let n' = n - 1
+         in let ih = visit n'
+            in case_succ ih
+  in visit n_given;;
+
+val fold_right_nat : 'a -> ('a -> 'a) -> int -> 'a = <fun>
+# fold_right_nat 0 1 1;;
+Characters 18-19:
+  fold_right_nat 0 1 1;;
+                   ^
+Error: This expression has type int but an expression was expected of type
+         int -> int
+# fold_right_nat 0 (fun ih -> succ (succ ih)) n;;
+Characters 44-45:
+  fold_right_nat 0 (fun ih -> succ (succ ih)) n;;
+                                              ^
+Error: Unbound value n
+# let twice_v4 n =
+  fold_right_nat 0 (fun ih -> succ (succ ih)) n;;
+val twice_v4 : int -> int = <fun>
+# twice_v4 2;;
+- : int = 4
+# let_add_v3 x y =
+      fold_right_nat y (fun ih -> succ ih) x;;
+Characters 0-10:
+  let_add_v3 x y =
+  ^^^^^^^^^^
+Error: Unbound value let_add_v3
+# let add_v3 x y =
+      fold_right_nat y (fun ih -> succ ih) x;;
+val add_v3 : int -> int -> int = <fun>
+# add_v3 1 2 ;;
+- : int = 3
+# let fib_v4 n_given =
+  let () assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat ... ... n_given
+in fib_n;;
+Characters 30-36:
+    let () assert (n_given >= 0) in
+           ^^^^^^
+Error: Syntax error
+# let fib_v6 n_given =
+  let () assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> fib_n + fib_succ_n)( n_given
+  in fib_n;;
+Characters 30-36:
+    let () assert (n_given >= 0) in
+           ^^^^^^
+Error: Syntax error
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> fib_n + fib_succ_n)( n_given
+  in fib_n;;
+Characters 137-138:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> fib_n + fib_succ_n)( n_given
+                                                                                  ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> fib_n + fib_succ_n) n_given
+  in fib_n;;
+Characters 118-123:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> fib_n + fib_succ_n) n_given
+                                                               ^^^^^
+Error: Unbound value fib_n
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> n_given + succ(n_given) n_given
+  in fib_n;;
+Characters 107-108:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> n_given + succ(n_given) n_given
+                                                    ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> n_given + succ(n_given)) n_given
+  in fib_n;;
+Characters 118-141:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> n_given + succ(n_given)) n_given
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type int but an expression was expected of type
+         int * int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (n_given ,n_given + succ(n_given))) n_given
+  in fib_n;;
+val fib_v6 : int -> int = <fun>
+# fib_v6 0;;
+- : int = 0
+# fib_v6 1;;
+- : int = 1
+# fib_v6 2;;
+- : int = 2
+# fib_v6 3;;
+- : int = 3
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (succ(n_given) ,n_given + succ(n_given))) n_given
+  in fib_n;;
+val fib_v6 : int -> int = <fun>
+# fib_v6 1;;
+- : int = 2
+# fib_v6 0;;
+- : int = 0
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given)) ,pred(n_given) + pred(pred(n_given))) n_given
+  in fib_n;;
+Characters 107-108:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given)) ,pred(n_given) + pred(pred(n_given))) n_given
+                                                    ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given))) n_given
+  in fib_n;;
+val fib_v6 : int -> int = <fun>
+# fib_v6 0;;
+- : int = 0
+# fib_v6 1;;
+- : int = -1
+# fib_v6 2;;
+- : int = 0
+# fib_v6 3;;
+- : int = 1
+# let fib_v0 n_given =
+  (* assert limits the recursive function for positive integers *)
+  let () = assert (n_given >= 0) in
+  let rec visit n =
+    if n = 0
+    then 0
+    else (if n = 1
+          then 1
+          else let n'' = n - 2
+               and n' = n - 1
+               in let ih'' = visit n''
+                  and ih' = visit n'
+                  in ih'' + ih')
+  in visit n_given;;
+
+val fib_v0 : int -> int = <fun>
+# fib_v0 0;;
+- : int = 0
+# fib_v0 1;;
+- : int = 1
+# fib_v0 2;;
+- : int = 1
+# fib_v0 3;;
+- : int = 2
+# fib_v6 3;;
+- : int = 1
+# fib_v6 4;;
+- : int = 2
+# fib_v6 5;;
+- : int = 3
+# fib_v6 6;;
+- : int = 4
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (1, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given))) n_given
+  in fib_n;;
+val fib_v6 : int -> int = <fun>
+# fib_v6 0;;
+- : int = 1
+# fib_v6 1;;
+- : int = -1
+# fib_v6 3;;
+- : int = 1
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = 
+    if n_given = 0
+    then 0
+    else(if n = 1
+	 then 1 
+	 else
+	   let
+    fold_right_nat (1, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given))) n_given
+  in fib_n;;
+Characters 186-189:
+      fold_right_nat (1, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given))) n_given
+                             ^^^
+Error: Syntax error: operator expected.
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = 
+    if n_given = 0
+    then 0
+    else(if n = 1
+	 then 1 
+	 else 
+	   let 
+    fold_right_nat in  (1, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given))) n_given
+  in fib_n;;
+Characters 180-182:
+      fold_right_nat in  (1, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given))) n_given
+                     ^^
+Error: Syntax error: operator expected.
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given))) n_given
+  in fib_n ;;
+val fib_v6 : int -> int = <fun>
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given) let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n))) n_given
+  in fib_n ;;
+Characters 161-162:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given) let n' = n - 1
+                                                                                                          ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given) let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n)) n_given
+  in fib_n ;;
+Characters 161-162:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> (pred(pred(n_given))) ,pred(n_given) + pred(pred(n_given) let n' = n - 1
+                                                                                                          ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> 
+			       let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n)
+			      )
+			      n_given
+  in fib_n ;;
+Characters 107-108:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> 
+                                                    ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n)) n_given
+  in fib_n ;;
+Characters 107-108:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+                                                    ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n)) n_given
+  in fib_n ;;
+Characters 107-108:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+                                                    ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n)) n_given
+  in fib_n ;;
+Characters 107-108:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+                                                    ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n)) n_given
+  in fib_n ;;
+Characters 107-108:
+    let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> let n' = n - 1
+                                                    ^
+Syntax error: ')' expected, the highlighted '(' might be unmatched
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> 
+  fun pred(n_given) + fun pred(pred(n_given))				 
+  )n_given
+  in fib_n ;;
+Characters 141-144:
+    fun pred(n_given) + fun pred(pred(n_given))				 
+                        ^^^
+Error: Syntax error: operator expected.
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0, 1) (fun ih -> 
+  pred(n_given) + pred(pred(n_given))				 
+  ) n_given
+  in fib_n ;;
+Characters 121-156:
+    pred(n_given) + pred(pred(n_given))				 
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type int but an expression was expected of type
+         int * int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat ... ... n_given
+  in fib_n;;
+Characters 100-102:
+    let (fib_n, fib_succ_n) = fold_right_nat ... ... n_given
+                                             ^^
+Error: Syntax error
+# fiv_v5 1;;
+Characters 0-6:
+  fiv_v5 1;;
+  ^^^^^^
+Error: Unbound value fiv_v5
+Did you mean fib_v0 or fib_v6?
+# fib_v5 1;;
+Characters 0-6:
+  fib_v5 1;;
+  ^^^^^^
+Error: Unbound value fib_v5
+Did you mean fib_v0 or fib_v6?
+# let fib_v5 n_given =
+  let () = assert (n_given >= 0) in
+  let rec visit n =
+    if n = 0
+    then (0, 1)
+    else let n' = n - 1
+         in let (fib_n', fib_n) = visit n'
+            in (fib_n, fib_n' + fib_n)
+  in let (fib_n, fib_succ_n) = visit n_given
+     in fib_n;;
+
+val fib_v5 : int -> int = <fun>
+# fib_v5 1;;
+- : int = 1
+# fib_v5 2;;
+- : int = 1
+# fib_v5 3;;
+- : int = 2
+# fib_v5 0;;
+- : int = 0
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat 0 (succ(succ n_given)), succ(n_given) n_given
+  in fib_n;;
+Characters 102-122:
+    let (fib_n, fib_succ_n) = fold_right_nat 0 (succ(succ n_given)), succ(n_given) n_given
+                                               ^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type int but an expression was expected of type
+         int -> int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat 0 (succ(succ n_given))+ succ(n_given) n_given
+  in fib_n;;
+Characters 102-122:
+    let (fib_n, fib_succ_n) = fold_right_nat 0 (succ(succ n_given))+ succ(n_given) n_given
+                                               ^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type int but an expression was expected of type
+         int -> int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0,1) (succ(fib_n), succ(fib_n) + fib_n) n_given
+  in fib_n;;
+Characters 106-140:
+    let (fib_n, fib_succ_n) = fold_right_nat (0,1) (succ(fib_n), succ(fib_n) + fib_n) n_given
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type 'a * 'b
+       but an expression was expected of type int * int -> int * int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0,1) (fib_succ_n, succ(fib_succ_n) + fib_succ_n) n_given
+  in fib_n;;
+Characters 106-149:
+    let (fib_n, fib_succ_n) = fold_right_nat (0,1) (fib_succ_n, succ(fib_succ_n) + fib_succ_n) n_given
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type 'a * 'b
+       but an expression was expected of type int * int -> int * int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0,1) (fib_succ_n, (succ(fib_succ_n) + fib_succ_n)) n_given
+  in fib_n;;
+Characters 106-151:
+    let (fib_n, fib_succ_n) = fold_right_nat (0,1) (fib_succ_n, (succ(fib_succ_n) + fib_succ_n)) n_given
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type 'a * 'b
+       but an expression was expected of type int * int -> int * int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0,1) (fib_succ_n, ((fib_succ_n - 1) + fib_succ_n)) n_given
+  in fib_n;;
+Characters 106-151:
+    let (fib_n, fib_succ_n) = fold_right_nat (0,1) (fib_succ_n, ((fib_succ_n - 1) + fib_succ_n)) n_given
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression has type 'a * 'b
+       but an expression was expected of type int * int -> int * int
+# let fib_v6 n_given =
+  let () = assert (n_given >= 0) in
+  let (fib_n, fib_succ_n) = fold_right_nat (0,1) (fib_succ_n, (succ(fib_succ_n) + fib_succ_n)) n_given
+  in fib_n;;

@@ -1,0 +1,25 @@
+let test_show_bool show_bool_candidate =
+let b0 = (show_bool_candidate true = "true")
+let b1 = (show_bool_candidate false = "false")
+in b0 && b1;;
+
+let show_bool b =
+if b then "true"
+else "false";; 
+
+let () assert (test_show_bool show_bool);;
+
+let test_show_char show_char_candidate =
+let b0 = (show_char_candidate 'a' = "'a'")
+and b1 = (show_char_candidate 'B' = "'B'")
+and b2 = (show_char_candidate '3' = "'3'")
+in b0 && b1 && b2;;
+
+let () assert (test_show_char show_char);;
+
+let show_char c =
+"'" ^ String.make 1 c^ "'";;
+
+let test_show_string show_string_candidate =
+let b0 = (show_string_candidate "Yale-NUS College" = "\"Yale-NUS College\"")
+let b1 = (show_string_candidate "" = "\"\"") 

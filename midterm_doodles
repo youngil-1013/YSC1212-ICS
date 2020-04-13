@@ -1,0 +1,887 @@
+>>>>WEEK 3 NOTES OCAML A LANGUAGE OF ALGEBRAIC EXPRESSIONS, WITH NAMES AND FUNCTIONS<<<<
+
+OCaml types and expressions
+<type> ::= ...
+<expression> ::= ...
+G |- e : t
+Means in a given type environment G, the expression e has the type t.
+
+>>The Toplevel Loop<<
+The toplevel loop reads an expression and if the expression is both grammatically and type correct, it evaluates and prints the result.
+<toplevel-expression> ::= <expression>
+
+>>Integers<<
+typing rule for integers:
+
+INT------------ Where n is an integer
+   G |- n : int
+-> in any given environment G, integer n has type int
+>>Booleans<<
+typing rule for booleans:
+
+BOOL_TRUE----------------
+         G |- true : bool
+
+BOOL_FASE-----------------
+         G |- false : bool
+in any type environemnt G, true and false have type bool.
+>>Characters<<
+
+CHAR-------------where c is a character
+    G |- c : char
+in any type enviornment G, character c has the type char
+as a note, the ' and the \ have to be expressed as '\'' and '\\'
+
+>>Strings<<
+
+STRING---------------------where s is a string
+      G |- s : string
+in any type enviornment G, string s has the type string
+as a note, the " and the \ have to be expressed as "\"" and "\\"
+
+>>Conditionals<<
+  G |- e1 : bool     G |- e2 : t     G |- e3 : t
+IF------------------------------------------------
+  G |- if e1 then e2 else e3 : t
+
+In any type environment G, the expression if e1 then e2 else e3 has type t whenever in that environment, e1 (the test) has type bool, e2 has the type t and e3 has the type t. The types for e2 and e3 are the same.
+
+>>Pairs<<
+    G |- e1 : t1   G |- e2 : t2
+PAIR---------------------------
+    G |- (e1, e2) : t1 * t2
+In any type environment G, the expression (e1, e2) has type t1 * t2 whenever in that environment, e1 has type t1 and e2 has type t2
+
+>>Tuples<<
+     G |- e1 : t1       ...          G |- eN : tN
+TUPLE----------------------------------------------
+     G |- (e1, ..., eN) : t1 * ... * tN
+
+Empty tuple = unit
+
+UNIT-----------------
+    G |- () : unit
+>>Declaring a Global Variable<<
+let x = any_type and y = any_type;;
+
+>>Functions and function applications<<
+
+   (x : t1), G |- e : t2
+FUN--------------------------
+   G |- fun x -> e : t1 -> t2
+in any type environment G, the expression fun x -> e has type t1 -> t2 whenever in that environment extended with the binding of x to t1, e has type t2 (read bottom to top)
+
+   G |- e0 : t1 -> t2     G |- e1 : t1
+APP------------------------------------
+   G |- e0 e1 : t2
+in any type environment G where the expression e0 has type t1 -> t2 and where e1 has type t1, the expression e0 e1 has type t2 (read top to bottom)
+
+fun x -> e is referred as a lambda-expression (function expression)
+fun        is referred as lambda
+         e is referred as the body of the lambda-expression
+    x      is referred as the formal parameter
+
+e0 e1 is referred as the function application
+   e1 is referred as the actual parameter
+
+>>Applying functions to functions<<
+(fun x -> fun y -> x) 1 10 
+==
+(fun x y -> x) 1 10
+
+-> in other words, this function takes in two arguments x and y, which are given as 1 and 10 and return x, or 1.
+
+>>In-built functions that returns functions<<
+( - ) subtraction
+( * ) multiplication
+( / ) division
+(mod) modulo
+(min) minimum
+(max) maximum
+(<),(>),(=),... comparison
+(&&) boolean conjunction
+(||) boolean disjunction
+(^)  string concatenation
+String.get
+
+>>Predicate<<
+Boolean-valued functions are often called "predicates"
+         G |- e1 : int    G |- e2 : int
+eqaul_int------------------------------
+         G |- e1 = e2 : bool
+
+
+Ex6.
+Find the type of the expression fun x -> 2 * x + 1
+
+INT----------------------- LUF-----------------------
+   (x : int), G |- 2 : int    (x : int), G |- x : int
+MUL-----------------------------------------------------    LUF-----------------------
+   (x : int), G |- 2 * x : int                                 (x : int), G |- 1 : int
+ADD-----------------------------------------------------------------------------------
+   (x : int), G |- 2 * x + 1 : int
+FUN------------------------------------
+   G |- fun x -> 2 * x + 1 : int -> int
+
+Ex8.
+a.   int -> int
+   fun x -> x + 1
+
+b.   int -> bool
+   fun x -> 3 = x
+
+c. bool -> int
+
+
+d.   int ->   int -> bool
+   fun x -> fun y -> x + y = y
+
+e. int -> int -> int
+  fun x y -> x + y
+
+>>Syntactic sugar for naming functions<<
+let f = fun x -> e
+==
+let f x = e
+
+ex:
+
+let make_odd = fun x -> 2 * x + 1
+==
+let make_odd x = 2 * x + 1
+
+>>>>WEEK 3 NOTES UNIT TESTS<<<<
+>>Unit Tests<<
+Unit tests are functions that evaluate a given candidate function. We use unit tests to see what a function should do before figuring out how it actually does it (coding)
+
+For example,
+
+let test_fac_v0 candidate =
+     (candidate 0 = 1)
+  && (candidate 1 = 1)
+  && (candidate 2 = 1 * 2)
+  && (candidate 3 = 1 * 2 * 3)
+  && (candidate 4 = 1 * 2 * 3 * 4)
+  && (candidate 5 = 1 * 2 * 3 * 4 * 5)
+  (* etc. *);;
+
+which can be re-expressed as:
+let test_fac_v1 candidate =
+   (candidate 0 = 1)
+&& (candidate 1 = 1)
+&& (candidate 2 = 2)
+&& (candidate 3 = 6)
+&& (candidate 4 = 24)
+&& (candidate 5 = 120);;
+
+take this unit-test for a fibonacci sequence:
+let test_fib candidate =
+     (candidate 0 = 0)
+  && (candidate 1 = 1)
+  && (candidate 2 = 1)
+  && (candidate 3 = 2)
+  && (candidate 4 = 3)
+  && (candidate 5 = 5)
+  && (candidate 6 = 8)
+  (* etc. *);;
+
+Ex.16 Write two unit-test functions for && and ||
+let test_conj candidate =
+  (candidate true true = true)
+&&(candidate true false = false)
+&&(candidate false true = false)
+&&(candidate false false = false);;
+
+let test_disj candidate =
+   (candidate true true = true)
+&& (candidate true false = true)
+&& (candidate false true = true)
+&& (candidate false false = false);;
+
+>>Code coverage<<
+or just test coverage, provides an arugment about how exhaustively a program is tested
+the unit-test for decrement_or_increment n, should test when n < 0, n = 0, n > 0
+if all sub expressions in the definition are evaluated, then the candidate function is exhaustively tested.
+
+Ex. 18
+Assume:
+    G |- e : bool
+NOT ----------------- and x has type int and y has type char
+    G |- not e : bool
+Then, does fun x -> not x have bool -> bool? or is it ill-typed?
+
+LUF------------------------------------------------
+   (x : bool), (x : int), (y : char), G |- x : bool
+NOT----------------------------------------------------
+   (x : bool), (x : int), (y : char), G |- not x : bool
+FUN---------------------------------------------------------
+   (x : int), (y : char), G |- fun x -> not x : bool -> bool
+
+>>>>WEEK 4 NOTES POLYMORHIC TYPES<<<<
+>>Monomorphic Types<< 
+These functions are monomorhically typed, as their type is compeltely determined and their context of use is completely fixed. 
+ex:
+fun x -> not x
+ bool -> bool
+
+>>Polymorphic types<<
+For some expressions, the type is not completely determined and the grammar of types is extended with type variables : a' |b' |c' ...
+
+Equality = self reference because we are defining the equality of functions based on the equality of their arguments and the equality of their results.
+
+Evaluating polymrphic types
+
+LUF---------------------
+   (x : a'), G |- x : a'
+NFY-------------------------------
+   (y : b'), (x : a'), G |- x : a'
+FUN----------------------------------------
+   (x : a'), G |- fun y -> x : a' -> b'
+FUN-------------------------------------------
+   G |- fun x -> fun y -> x : a' -> b' -> a'
+
+typeing derivation tree for a' -> b' -> b':
+
+   G |- ?? : a' -> b' -> b'
+
+   (x : a'), G |- ?? : b' -> b'
+FUN---------------------------------
+   G |- fun x -> ?? : a' -> b' -> b'
+
+
+   (y : b'), (x : a'), G |- y : b'
+FUN--------------------------------
+   (x : a'), G |- fun x -> fun y : b' -> b'
+FUN-----------------------------------------
+   G |- fun x -> fun y -> y : a' -> b' -> b'
+
+'a -> 'b -> 'a * 'b
+
+   (y : 'b), (x : 'a), G |- fun x -> fun y -> (x, y) : 'a * 'b
+FUN-----------------------------------------------------------
+   (x : 'a), G |- fun x -> fun y -> (x, y): 'b -> 'a * 'b
+FUN------------------------------------------------------
+   G |- fun x -> fun y -> (x, y) : 'a -> 'b -> 'a * 'b
+
+
+
+bool -> 'a -> 'a -> 'a
+!!!!!!!!!!!EXPRESSIONS OF TYPE!!!!!!!!!
+>>>> WEEK4 NOTES: OCAML A LANGUAGE WITH LEXCIAL SCOPE AND SSTUFF
+OCaml is a statically types language. It syntactic units are expressions, and evaluating a syntactically correct and type-correct expression yields a value that has the same type as this expression
+
+>>Declaring a local variable with a local let-expression
+
+<expression> ::= ...
+               | let <formal> = (definiens> in <expression>
+   G |- e1 : t1      (x : t1), G |- e2 : t2
+LET----------------------------------------
+   G |- let x1 = e1 in e2 : t2
+In any gien type environment G, the expression "let x1 = e1 in e2" has type t2 when e1 has type t1 in the same environment and e2 has type t2 in the extension of this environment where x1 has type t1.
+
+let x = d in e declares x to be local to e. (x = formal parameter, d = definiens, e = body)
+
+    G |- let x = n in x > 0          G |- x : bool
+DISJ------------------------------------------------------------
+    (n : int), (x : bool), . |- (let x = n in x > 0) || x : bool
+FUN-----------------------------------------------------------------
+   (x : bool), . |- fun n -> (let x = n in x > 0) || x : int -> bool
+FUN---------------------------------------------------------------------
+   . |- fun x -> fun n -> (let x = n in x >0) || x : bool -> int -> bool
+
+>>Assertions!<<
+
+let () = assert (test_successor identity = false)
+NOT
+let () = assert (test_sucessor identity)
+
+>>Shielding unit tests!<<
+let unit_test arg1 arg2 =
+  let () = assert (boundaries) in
+  let a0 = test 1
+  and a1 = test 2
+
+>>>>WEEK 5 NOTES STRINGS<<<<
+Strings are made up of double quotations and can be concatenated (^);;
+String.length (string -> int)
+Stirng.get (string -> int -> char)
+String.map f s applies function f to all characters of s in increasing inex order and stores the result in a new string.
+String.make int char -> string
+
+Printf.printf 
+vs
+Sptringf.printf
+
+module Stringy = (* added for versions of OCaml that are anterior to 4.02.0 *)
+  struct
+    (*
+       val mapi : (int -> char -> char) -> string -> string
+       String.mapi f s calls f with each character of s and its index (in increasing index order) and stores the results in a new string that is returned.
+       Since 4.02.0
+       https://caml.inria.fr/pub/docs/manual-ocaml/libref/String.html
+    *)
+    
+    let mapi f s =
+      let i = ref ~-1
+      in String.map (fun c ->
+                      i := succ !i;
+                      f !i c)
+                    s
+
+    (* ***** *)
+
+    (*
+       val init : int -> (int -> char) -> string
+       String.init n f returns a string of length n, with character i initialized to the result of f i (called in increasing index order).
+       Raise Invalid_argument if n < 0 or n > Sys.max_string_length.
+       Since 4.02.0
+    *)
+    let init n f =
+      if 0 <= n && n <= Sys.max_string_length
+      then mapi (fun i _ -> f i) (String.create n)
+      else raise (Invalid_argument "String.create");;
+  end;;
+
+Unparsers collection:
+
+let show_bool b =
+    if b  
+    then "true"
+    else "false;;
+
+let show_bool_using_sprintf b =
+    Printf.sprintf "%B" b;;
+    
+let show_char c =
+    "'" ^ (if c = '\\' then "\\\\"
+      else if c = '\'' then "\\\'"
+      else String.make 1 c)
+    ^ "'";;
+
+let show_char_using_sprintf c =
+    Printf.sprintf "%c" c;;
+
+let show_string s =
+    "\"" ^ s ^ "\"";;
+
+let show_char_using_sprintf s =
+    Printf.sprintf "\"%s\"" s;;
+
+let show_int i =
+    if i < 0
+    then "(" ^ string_of_int i ^ ")"
+    else string_of_int i;;
+
+let show_int_using_sprintf i =
+    Printf.sprintf "%i" i;;
+
+let show_pair show_v1 show_v2 (v1, v2) =
+  "(" ^ (show_v1 v1) ^ "," ^ (show_v2 v2) ^ ")";;
+
+>>Tracing Function Calls and Returns<<
+Function calls look like:
+function arg1 ->
+  function arg2 ->
+
+Function returns look like:
+  function arg2 <- outcome1
+function arg1 <- outcome2
+
+>>The Factorial Function<<
+let test_fac fac_candidate =
+  let b0 = (fac_candidate 0 = 1)
+  and b1 = (fac_candidate 1 = 1)
+  and b2 = (fac_candidate 2 = 2)
+  and b3 = (fac_candidate 3 = 6)
+  and b4 = (fac_candidate 4 = 24)
+  and b5 = (let n = Random.int 15
+            in fac_candidate (succ n)
+               = (succ n) * fac_candidate n)
+  in b0 && b1 && b2 && b3 && b4 && b5;;
+
+using rec, we can express the factorial function as:
+let rec fac n =
+    n * fac (pred n);;
+
+let indent n =
+  String.make (2 * n) ' ';;
+
+let show_int n =
+  if n < 0
+  then "(" ^ string_of_int n ^ ")"
+  else string_of_int n;;
+
+let traced_fac n_given =
+  let () = assert (n_given >= 0)
+  in let rec countdown n depth =
+       let () = Printf.printf "%scountdown %s ->\n"
+                              (indent depth)
+                              (show_int n) in
+       let result = (if n = 0
+                     then 1
+                     else n * (countdown (n - 1) (depth + 1)))
+       in let () = Printf.printf "%scountdown %s <- %s\n"
+                                 (indent depth)
+                                 (show_int n)
+                                 (show_int result) in
+          result
+     in let () = Printf.printf "fac %s ->\n" (show_int n_given)
+        in let result = countdown n_given 1
+           in let () = Printf.printf "fac %s <- %s\n" (show_int n_given) (show_int result)
+              in result;;
+>>Week 5 Notes: Induction and Recursion over Natural Numbers<<
+skeleton
+let function_name arg_given =
+  let () = assert (arg >= 0)
+  (* checks that the given arg is inbound *)
+  in let rec visit arg =
+  (* creates the recursion function visit, with the argument arg *) 
+       if x = 0
+       then ...
+       (* what is the base case? *)
+       else let x' = pred arg
+       (* locally defines x' as the predecessor of x *)
+            in let ih = visit x'
+	    (* locally defines the inductive hypothesis *)
+               in ... ih
+	       (* what are you going to do to the iductive hypothesis? *)
+     in visit arg_given;;
+     (* uses the locally defined function visit on a globally define x_given *)
+
+let add_v0 x_given y_given =
+  let () = assert (x_given >= 0)
+  in let rec visit x =
+       if x = 0
+       then ...
+       else let x' = pred x
+            in let ih = visit x'
+               in ... ih
+     in visit x_given;;
+
+>>>>WEEK 6 NOTES<<<<
+>>Functional Abstraction and Instantiations<<
+Concrete example: add_1 n = 1 + n
+Abstract example: add_i n = i + n
+
+We can abstract functions; for example,
+let the_generic_expression f i n =
+  f i n
+
+the_generic_expression ( * ) 1 2
+
+>>Generic Programming with Natural Numbers<<
+We can abstract the skeleton of structural recursion:
+let ... n_given =
+  let () = assert (n_given >= 0) in
+  let rec visit n =
+    if n = 0
+    then ...
+    else let n' = n - 1
+         in let ih = visit n'
+            in ...
+  in visit n_given;;
+
+into "fold_right":
+let fold_right_nat zero_case succ_case n_given =
+  let () = assert ((* fold_right_nat : 'a -> ('a -> 'a) -> int -> 'a *)
+ n_given >= 0) in
+  let rec visit n =
+    if n = 0
+    then zero_case
+    else let n' = n - 1
+         in let ih = visit n'
+            in succ_case ih
+  in visit n_given;;
+
+Think of it as: fold_right_nat (when given arg is 0) (fun ih -> what we do each step) (number of steps)
+
+>>From primitive iteration to primitive recursion<<
+parafold_right_nat deals with recursion AKA the function calls itself.
+ 
+let parafold_right_nat zero_case succ_case n_given =
+ (* parafold_right_nat : 'a -> (int -> 'a -> 'a) -> int -> 'a *)
+  let () = assert (n_given >= 0) in
+  let rec visit n =
+    if n = 0
+    then zero_case
+    else let n' = n - 1
+         in let ih = visit n'
+            in succ_case n' ih    (* <-- succ_case takes two arguments *)
+  in visit n_given;;
+
+>>>>WEEK 7 ON SIMPLIFYING EXPRESSIONS<<<<
+Some OCaml expression never complete:
+- They might raise an error (1 / 0)
+  We can check if an expression is of type s by: fun () -> (1 / 0) = 0;;
+- They might contain assertions that fail
+- or diverge
+  let rec divere () = diverge () in diverge ();;
+- or a recursive call that is not a tail call
+- or emit traces
+
+Pure expressions yield no side effects and always yield a value.
+
+To determine if two pure expressions are equivalent:
+- Always yield the same result
+
+To determine if two impure expressions are equivalent:
+- Print and yield the same result or error
+- Diverge and Stack overflow in the same way
+
+>>>>WEEK 7 INLINING FUNCTIONS<<<<
+The process of inlining function and testing them is called "regression test"
+
+Give a function:
+     let foo x y z = (function)
+the call:
+    (foo a b c)
+is unfolded as:
+    ((fun x y z -> (function) a b c))
+
+and applying the function foo yields:
+    (let z = c
+     and y = b
+     and x = a
+     in (function))
+
+EXAMPLE:
+let twice_v4 n =
+    fold_right_nat 0 (fun ih -> succ (succ ih)) n;;
+
+let twice_v5 n =
+    let case_succ = (fun ih -> succ (succ ih))
+    and case_zero = 0
+    and n = n
+    in let () = assert (0 <= n) in
+       let rec visit n =
+       	   if n = 0
+	   then case_zero
+	   else let n' = n - 1
+	   	in let ih = visit n'
+		   in case_succ ih
+	in visit n;;
+
+let twice_v6 n =
+    in let () = assert (0 <= n) in
+       let rec visit n =
+       	   if n = 0
+	   then 0
+	   else let n' = n - 1
+	   	in let ih = visit n'
+		   in (fun ih -> succ (succ ih))
+	in visit n;;
+
+let twice_v7 n =
+    in let () = assert (0 <= n) in
+       let rec visit n =
+       	   if n = 0
+	   then 0
+	   else let n' = n - 1
+	   	in let ih = visit n'
+		   in succ (succ ih)
+	in visit n;;
+
+let twice_v7 n =
+    in let () = assert (0 <= n) in
+       let rec visit n =
+       	   if n = 0
+	   then 0
+	   else let n' = n - 1
+	   	in let ih = visit n'
+		   in let ih = ih
+		      in succ (succ ih)
+	in visit n;;
+
+let twice_v8 n =
+    in let () = assert (0 <= n) in
+       let rec visit n =
+       	   if n = 0
+	   then 0
+	   else let n' = n - 1
+	   	in let ih = visit n'
+		      in succ (succ ih)
+	in visit n;;
+	
+>>>>WEEK 8 POLYMORPHIC LISTS<<<<
+ A list is like an onion, with one payload per layer
+ - an empty list is noted [] and referred to as "nil"
+ - constructing a value v and a list of values vs is noted v :: vs,
+ where :: is referred to as "cons". The list's head is v and its tail is vs
+
+Typing rule:
+
+NIL-----------------
+   G |- [] : 'a list
+
+    G |- e : t   G |- es : t list
+CONS-----------------------------
+    G |- e :: es : t list
+
+Unlike in python, OCaml lists are represented as linked pairs in memory.
+OCaml can distinguish the values of ns3 and ns3':
+(
+let ns3 = [2; 1; 0];;
+let ns3' = 2 :: ns2 :: [];;
+)
+Thus ns3 = ns3' (structurally equal)
+But not(ns3 == ns3') (physically not equal -> identity of internal representations differ)
+
+We can use:
+List.cons 2 (List.cons 1 (List.cons 0 {}))
+=
+2 :: 1 :: 0 :: []
+=
+[2; 1; 0]
+
+Lists are immutable and are linked lists of pairs in memory
+
+LIST ACCESSORS:
+List.hd (returns the head of a list)
+List.tl (returns the tail of a list)
+
+Recursion for lists:
+
+let rec visit vs =
+  if vs = []
+  then ...
+  else let v = List.hd vs
+       and vs' = List.tl vs
+       in let ih = visit vs'
+          in ...ih...;;
+
+let rec visit vs =
+  if vs = []
+  then ...
+  else let v = List.hd vs
+       in ...visit (List.tl vs)...;;
+
+let show_list show_yourself vs =
+  let rec visit vs =
+  if vs = []
+  then "[]"
+  else (show_yourself (List.hd vs)) ^ " :: " ^ visit (List.tl vs)
+      in visit vs;;
+
+List.length
+
+MATCH EXPRESSIONS
+
+we can express:
+if vs = []
+then ...
+else let v = List.hd vs
+     and vs' = List.tl vs
+     in ...
+
+with
+math vs with
+| [] -> ...
+| v :: vs' -> ...
+
+let show_int_in_English n =
+  match n with
+  | 0 ->
+     "zero"
+  | 1 ->
+     "one"
+  | -1 ->
+     "minus one"
+  | 2 ->
+     "two"
+  | -2 ->
+     "minus two"
+  | _ ->    (* <-- underscore matches any other value *)
+     "too bad";;
+
+WE CAN EXPRESS LET-EXPRESSION SUCH AS:
+let (a, b) = (3, 4) in a + b
+AS:
+match (3, 4) with
+| (a, b) -> a + b
+
+let list_copy_v0 xs_given =
+  let rec visit xs =
+    match xs with
+    | [] ->
+       ...
+    | x :: xs' ->
+       let ih = visit xs'
+       in ...
+  in visit xs_given;;
+
+let list_copy_v0 xs_given =
+  let rec visit xs =
+    match xs with
+    | [] ->
+       []
+    | x :: xs' ->
+       let ih = visit xs'
+       in x :: ih
+  in visit xs_given;;
+
+BTW @ appends lists!
+
+>>>>WEEK 8 REPRESENTING SETS AS LISTS<<<<
+The order of elements does not matter!
+
+a member function tests whether a given value occurs in a given list of values:
+let member v vs_init =
+  let rec visit vs =
+    match vs with
+    | [] ->
+       false
+    | v' :: vs' ->
+       if v = v'
+       then true
+       else visit vs'
+  in visit vs_init;;
+
+let cart vs_init ws_init =
+    let rec traverse_vs vs =
+    match vs with
+    | [] ->
+      []
+    | v :: vs' ->
+      let current = traverse_vs vs'
+      in let rec traverse_ws ws =
+      	  match ws with
+	  | [] ->
+	    current
+	  | w :: ws' ->
+	    let current_vs_ws = traverse_ws'
+	    in (v, w) :: current_vs_ws
+	  in traverse_ws ws_init
+	in traverse_vs vs_init;;
+
+>>>>WEEK 9 NOTES REVERSING LISTS<<<<
+List reversal is obviously involutory (f(f(x)) = x)
+
+hd_op returns a non-empty list's last element
+tl_op returns all of a non-empty list's elements except the last one.
+
+let hd_op vs_init =
+    let rec visit v vs =
+    match vs with
+    | [] ->
+      v
+    | v' :: vs' ->
+      visit v' vs'
+    in match vs_init with
+    | [] ->
+      assert false
+    | v :: vs' ->
+      visit v vs';;
+
+List.rev reverses a given list
+List.nth [list] int
+space complexity and time complexity
+
+>>Using an accumulator<<
+SYNCHRONIZING the Traversal and the construction of the output list by adding a second argument to the function:
+let reverse_v4 vs_init =
+  let rec visit vs a =
+    if vs = []
+    then a
+    else visit (List.tl vs) (List.hd vs :: a)
+  in visit vs_init [];;
+
+>>Programming using accumulators<<
+lambda-dropped: scope-sensitive, uses a y_init declared outside the definition
+let add_v1 x_init y_init =
+    let rec visit x =
+      if x = 0
+      then y_init
+      else succ (visit (pred x))
+    in visit x_init;;
+lambda-lifted: scope-insensitive, uses a y_init declared inside the definition
+let add_v2 x_init y_init =
+  let rec visit x y =
+    if x = 0
+    then y
+    else succ (visit (pred x) y)
+  in visit x_init y_init;;
+using an accumulator: accumulators make it possible to start constructing the result as we go
+let add_v3' x_init y_init =
+  let rec visit x y =
+    if x = 0
+    then y
+    else visit (pred x) (succ y)
+  in visit x_init y_init;;
+
+visualized:
+# traced_reverse_v4 [1; 2; 3; 4; 5];;
+visit [1; 2; 3; 4; 5] [] ->
+visit [2; 3; 4; 5] [1] ->
+visit [3; 4; 5] [2; 1] ->
+visit [4; 5] [3; 2; 1] ->
+visit [5] [4; 3; 2; 1] ->
+visit [] [5; 4; 3; 2; 1] ->
+visit [1; 2; 3; 4; 5] [] <- [5; 4; 3; 2; 1]
+- : int list = [5; 4; 3; 2; 1]
+# traced_look_Ma_no_accumulator [1; 2; 3; 4; 5];;
+visit [1; 2; 3; 4; 5] ->
+  visit [2; 3; 4; 5] ->
+    visit [3; 4; 5] ->
+      visit [4; 5] ->
+        visit [5] ->
+          visit [] ->
+          visit [] <- []
+        visit [5] <- [5]
+      visit [4; 5] <- [4; 5]
+    visit [3; 4; 5] <- [3; 4; 5]
+  visit [2; 3; 4; 5] <- [2; 3; 4; 5]
+visit [1; 2; 3; 4; 5] <- [1; 2; 3; 4; 5]
+- : int list = [1; 2; 3; 4; 5]
+
+>>>>Week 9 GENERIC PORGRAMMING WIHT LISTS<<<<
+fold_right_list nil_case (ih_case) list
+
+using an accumulator:
+
+let ... vs_init =
+  let rec traverse vs a =
+    match vs with
+    | [] ->
+       a
+    | v :: vs' ->
+       traverse vs' ...
+  in traverse vs_init ...;;
+
+https://delimited-continuation.github.io/YSC1212/2018-2019_Sem2/week-09_generic-programming-with-lists.html
+solution for exercise 14 is labelled as solution for exercise 15
+Week 09 The Art of Computer Science
+-Binary Trees included, but never discussed
+
+>>>>The Art of Computer Science<<<<
+
+>>>>Week 9 Concrete data types<<<<
+declaring new types!
+-pre-exisitng types:
+type name = strings
+-compound types:
+type new = int * int
+-polymorphic type:
+type ('a, 'b) pair = 'a * 'b
+
+type ('a, 'b) pair =
+  | Pair of 'a * 'b;;
+This declares types so that they have type constructors (extending the BNF)
+
+>>Option types<<
+option type help us take into account partial functions!
+None -> no arguments
+Some -> Unary argument
+let pure_fac n =
+ (* pure_fac : int -> int option *)
+  if n < 0
+  then None
+  else Some (fac n);;
+
+For triplets, we could use:
+type comparison = Lt | Eq | Gt;;
+
+let compare v1 v2 =
+ (* compare : 'a -> 'a -> comparison *)
+  if v1 < v2 then Lt else if v1 = v2 then Eq else Gt;;
+
+>>>> Polymorphic binary trees <<<<

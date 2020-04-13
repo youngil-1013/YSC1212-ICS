@@ -1,0 +1,31 @@
+(* unit test for sumtorials *)
+
+let test_sumtorial_v0 candidate =
+  (* the base case: *)
+  let b0 = (candidate 0 = 0)
+  (* some intuitive cases: *)
+  and b1 = (candidate 1 = 1)
+  and b2 = (candidate 2 = 3)
+  and b3 = (candidate 3 = 6)
+  and b4 = (candidate 4 = 10)
+  and b5 = (candidate 5 = 15)
+  (* instance of the induction step: *)
+  and b6 = (let n = Random.int 20
+            in candidate (succ n) = (succ n) + candidate n)
+             (* etc. *)
+  in b0 && b1 && b2 && b3 && b4 && b5 && b6;;
+
+test_sumtorial_v0 (fun n -> (n * n + n)/2);;
+(* sanity testing *)
+
+let sumtorial_v0 n_given =
+  (* using parafold_right_nat to define a sumtorial function *)
+  let () = assert (n_given >= 0) in
+  parafold_right_nat 0 (fun n' ih -> (succ n') + ih) n_given;;
+
+test_sumtorial_v0 sumtorial_v0;;
+
+let sumtorial_v1 n_given =
+  (* using a non-recursive function to define a sumtorial function *)
+  let () = assert (n_given >= 0) in
+  (n_given * (n_given + 1)) / 2;;

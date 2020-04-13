@@ -1,0 +1,20 @@
+(*
+(fun x -> e) e'
+=~=
+let x = e' in e
+
+let x = v in e
+=~=
+e [v/x] <- substitution
+ *)
+
+let twice_v4 n = fold_right_nat 0 (fun ih -> succ (succ ih)) n;;
+let fold_right_nat case_zero case_succ n =
+  let () = assert (0 <= n) in
+  let rec visit n =
+    if n = 0
+    then case_zero
+    else let n' = n - 1
+         in let ih = visit n'
+            in case_succ ih
+  in visit n;;
